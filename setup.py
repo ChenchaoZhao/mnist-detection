@@ -6,7 +6,7 @@ with open("README.md", "r") as f:
 
 setup(
     name="mnist-detection",
-    version="0.1.4",
+    version="0.1.5",
     author="Chenchao Zhao",
     author_email="chenchao.zhao@gmail.com",
     description="Simulated MNIST detection dataset",
