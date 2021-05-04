@@ -6,11 +6,11 @@ with open("README.md", "r") as f:
 
 setup(
     name="mnist-detection",
-    version="0.1.0",
+    version="0.1.3",
     author="Chenchao Zhao",
     author_email="chenchao.zhao@gmail.com",
     description="Simulated MNIST detection dataset",
-    packages=find_packages(exclude=["tests", "scripts", "configs"]),
+    packages=find_packages(exclude=["tests", "scripts"]),
     long_description=long_description,
     long_description_content_type="text/markdown",
     install_requires=["torch", "numpy", "pillow", "omegaconf", "torchvision"],

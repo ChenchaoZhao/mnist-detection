@@ -13,9 +13,7 @@ def load_configs(path):
     return OmegaConf.load(path)
 
 
-CONFIG_PATH = os.path.join(
-    os.path.realpath("__file__"), os.pardir, "configs", "simulator.yaml"
-)
+CONFIG_PATH = os.path.join("configs", "simulator.yaml")
 
 DEFAULT_CONFIG = load_configs(CONFIG_PATH).DEFAULT
 
