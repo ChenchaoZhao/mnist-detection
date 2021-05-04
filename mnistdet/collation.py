@@ -47,7 +47,7 @@ def collate_pil_images(
 
     W, H = w * columns, h * rows
 
-    img = PIL.Image.new(mode, (W, H))
+    img = Image.new(mode, (W, H))
     idx = 0
     for rdx in range(rows):
         for cdx in range(columns):
@@ -106,7 +106,7 @@ class CollateFunctionBase(Callable):
             assert k in self.KEYS
         self.keys = keys
         if isinstance(mode, str):
-            mode = CollateMode[mode]
+            mode = CollateMode(mode)
         assert isinstance(mode, CollateMode)
         self.mode = mode
         if mode == CollateMode.MOSAIC:
@@ -115,22 +115,23 @@ class CollateFunctionBase(Callable):
 
     def __call__(self, batch: Dict[str, Tuple[Any]]) -> Tuple[Any]:
 
-        if self.mode == CollateMode.TOLIST:
-            outputs = {k: [] for k in self.keys}
-            for k, v in batch.items():
+        outputs = {k: [] for k in self.keys}
+        for item in batch:
+            for k, v in item.items():
                 outputs[k].append(v)
+
+        if self.mode == CollateMode.TOLIST:
             return tuple([outputs[k] for k in self.keys])
 
         elif self.mode == CollateMode.MOSAIC:
             row, col = self._row_col
-            outputs = {}
             for k in self.keys:
                 if k == "image" or k == "mask":
-                    outputs[k] = collate_pil_images(batch[k], rows=row, columns=col)
+                    outputs[k] = collate_pil_images(outputs[k], rows=row, columns=col)
                 elif k == "bbox":
-                    outputs[k] = collate_boxes(batch[k], rows=row, columns=col)
+                    outputs[k] = collate_boxes(outputs[k], rows=row, columns=col)
                 elif k == "label":
-                    outputs[k] = torch.stack(batch[k], 0)
+                    outputs[k] = torch.cat(outputs[k], 0)
                 else:
                     raise NotImplementedError(f"Keyword: {k} is not implemented.")
 
