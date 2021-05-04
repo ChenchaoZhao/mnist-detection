@@ -10,7 +10,7 @@ from .simulator import generate_detection_image_with_annotation
 __all__ = ["DetectionDatasetBase", "DetectionWithCenterMask"]
 
 
-class DetectionDatasetBase(torch.utils.data.Dataset):
+class DetectionDatasetBase:
     """
     Params:
         data_src: torch image Dataset

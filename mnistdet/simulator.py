@@ -21,7 +21,7 @@ DEFAULT_CONFIG = load_configs(CONFIG_PATH).DEFAULT
 
 
 def generate_detection_image_with_annotation(
-    src_data: Sequence[Image.Image, int],
+    src_data: Sequence[Tuple[Image.Image, int]],
     num_src: int,
     config: Optional[OmegaConf] = None,
 ) -> Tuple[Image.Image, List[List[int]], List[int]]:
