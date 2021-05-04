@@ -76,11 +76,12 @@ class DetectionWithCenterMask(DetectionDatasetBase):
         image = outputs["image"]
         bbox = outputs["bbox"]
         label = outputs["label"]
+        W, H = image.size
         center = 0.5 * (bbox[:, :2] + bbox[:, 2:])
         center[:, 0::2] *= W
         center[:, 1::2] *= H
         center = center.numpy().astype(int)
-        W, H = image.size
+
         mask = np.ones((W, H), dtype=np.uint8) * 255
         for xy, z in zip(center, label):
             mask[xy] = label
