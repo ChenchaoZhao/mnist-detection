@@ -135,7 +135,7 @@ class CollateFunctionBase(Callable):
         else:
             raise NotImplementedError(f"Collate mode: {self.mode} is not implemented.")
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         out = []
         out.append(self.__class__.__name__)
         for k, v in self.__class__.__dict__.items():

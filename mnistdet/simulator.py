@@ -1,13 +1,14 @@
 import os
 import numpy as np
 import PIL
+from typing import *
 from PIL import Image, ImageDraw
+from omegaconf import OmegaConf
 
 __all__ = ["DEFAULT_CONFIG", "load_configs", "generate_detection_image_with_annotation"]
 
 
 def load_configs(path):
-    from omegaconf import OmegaConf
 
     return OmegaConf.load(path)
 
@@ -19,7 +20,11 @@ CONFIG_PATH = os.path.join(
 DEFAULT_CONFIG = load_configs(CONFIG_PATH).DEFAULT
 
 
-def generate_detection_image_with_annotation(src_data, num_src, config=DEFAULT_CONFIG):
+def generate_detection_image_with_annotation(
+    src_data: Sequence[Image.Image, int],
+    num_src: int,
+    config: Optional[OmegaConf] = None,
+) -> Tuple[Image.Image, List[List[int]], List[int]]:
     """
     params:
         src_data: torch Dataset class or List-like object [Image, Label]
@@ -31,6 +36,9 @@ def generate_detection_image_with_annotation(src_data, num_src, config=DEFAULT_C
         boxes:  List[Box], Box is List[int] [x0, y0, x1, y1]
         labels: List[int], ground truth labels for each box
     """
+
+    if config is None:
+        config = DEFAULT_CONFIG
 
     canvas = config.canvas
     margin = config.margin
