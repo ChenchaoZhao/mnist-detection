@@ -1,3 +1,7 @@
+from omegaconf import OmegaConf
+
+__all__ = ["DEFAULT_CONFIG"]
+default_config_string = """
 DEFAULT:
     canvas: [256, 256]
     margin: [50, 50]
@@ -11,3 +15,6 @@ DEFAULT:
     fgd_contrast: 1.0
     fgd_bridgtness: 1.8
     blur_radius: 1.7
+"""
+
+DEFAULT_CONFIG = OmegaConf.create(default_config_string)
