@@ -2,6 +2,7 @@ from typing import *
 from PIL import Image
 import torch
 import torchvision
+import numpy as np
 from omegaconf import OmegaConf
 from .simulator import generate_detection_image_with_annotation
 
@@ -62,3 +63,25 @@ class DetectionDatasetBase(torch.utils.data.Dataset):
 
     def __len__(self) -> int:
         return self.max_iter
+
+
+class DetectionWithCenterMask(DetectionDatasetBase):
+    def __getitem__(self, idx: int) -> Dict[str, Any]:
+        outputs = super().__getitem__(idx)
+        image = outputs["image"]
+        bbox = outputs["bbox"]
+        label = outputs["label"]
+        center = 0.5 * (bbox[:, :2] + bbox[:, 2:])
+        center[:, 0::2] *= W
+        center[:, 1::2] *= H
+        center = center.numpy().astype(int)
+        W, H = image.size
+        mask = np.ones((W, H), dtype=np.uint8) * 255
+        for xy, z in zip(center, label):
+            mask[xy] = label
+
+        mask = Image.fromarray(mask)
+
+        outputs["mask"] = mask
+
+        return outputs
