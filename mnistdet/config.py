@@ -17,4 +17,4 @@ DEFAULT:
     blur_radius: 1.7
 """
 
-DEFAULT_CONFIG = OmegaConf.create(default_config_string)
+DEFAULT_CONFIG = OmegaConf.create(default_config_string).DEFAULT
