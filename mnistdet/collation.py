@@ -100,6 +100,7 @@ class CollateFunctionBase(Callable):
         keys: Sequence[str],
         mode: Union[CollateMode, str],
         mosaic_row_col: Optional[Tuple[int, int]] = None,
+        to_tensor: bool = True,
     ) -> None:
 
         for k in keys:
@@ -112,6 +113,7 @@ class CollateFunctionBase(Callable):
         if mode == CollateMode.MOSAIC:
             assert mosaic_row_col is not None
         self._row_col = mosaic_row_col
+        self._to_tensor = to_tensor
 
     def __call__(self, batch: Dict[str, Tuple[Any]]) -> Tuple[Any]:
 
@@ -127,7 +129,9 @@ class CollateFunctionBase(Callable):
             row, col = self._row_col
             for k in self.keys:
                 if k == "image" or k == "mask":
-                    outputs[k] = collate_pil_images(outputs[k], rows=row, columns=col)
+                    outputs[k] = collate_pil_images(
+                        outputs[k], rows=row, columns=col, to_tensor=self._to_tensor
+                    )
                 elif k == "bbox":
                     outputs[k] = collate_boxes(outputs[k], rows=row, columns=col)
                 elif k == "label":
