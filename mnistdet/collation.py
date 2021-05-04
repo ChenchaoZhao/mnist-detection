@@ -1,6 +1,7 @@
 from enum import Enum
 from typing import *
 from PIL import Image
+import numpy as np
 import torch
 import torchvision.transforms.functional as TF
 
@@ -39,7 +40,7 @@ def collate_pil_images(
                 f"Type of image {type(img)} is not in (`PIL.Image.Image`, `torch.Tensor`)"
             )
         assert pil_img.size == atom_size
-        pil_images.append(pil_img)
+        pil_images.append(pil_img.convert(mode))
 
     w, h = atom_size
 
@@ -128,10 +129,23 @@ class CollateFunctionBase(Callable):
         elif self.mode == CollateMode.MOSAIC:
             row, col = self._row_col
             for k in self.keys:
-                if k == "image" or k == "mask":
+                if k == "image":
                     outputs[k] = collate_pil_images(
-                        outputs[k], rows=row, columns=col, to_tensor=self._to_tensor
+                        outputs[k],
+                        rows=row,
+                        columns=col,
+                        mode="RGB",
+                        to_tensor=self._to_tensor,
                     )
+                elif k == "mask":
+                    pil_mask = collate_pil_images(
+                        outputs[k], rows=row, columns=col, mode="L", to_tensor=False
+                    )
+                    if self._to_tensor:
+                        m = np.array(pil_mask)
+                        outputs[k] = torch.tensor(m).long()
+                    else:
+                        outputs[k] = pil_mask
                 elif k == "bbox":
                     outputs[k] = collate_boxes(outputs[k], rows=row, columns=col)
                 elif k == "label":
