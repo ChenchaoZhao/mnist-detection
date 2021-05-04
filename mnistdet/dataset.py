@@ -7,6 +7,9 @@ from omegaconf import OmegaConf
 from .simulator import generate_detection_image_with_annotation
 
 
+__all__ = ["DetectionDatasetBase", "DetectionWithCenterMask"]
+
+
 class DetectionDatasetBase(torch.utils.data.Dataset):
     """
     Params:
