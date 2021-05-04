@@ -78,14 +78,14 @@ class CollateFunctionBase(Callable):
 
     def __init__(
         self,
-        keys: Union[Set[str], Sequence[str]],
+        keys: Sequence[str],
         mode: Union[CollateMode, str],
         mosaic_row_col: Optional[Tuple[int, int]] = None,
     ) -> None:
 
         for k in keys:
             assert k in self.KEYS
-        self.keys = keys if isinstance(keys, set) else set(keys)
+        self.keys = keys
         if isinstance(mode, str):
             mode = CollateMode[mode]
         assert isinstance(mode, CollateMode)
@@ -100,7 +100,7 @@ class CollateFunctionBase(Callable):
             outputs = {k: [] for k in self.keys}
             for k, v in batch.items():
                 outputs[k].append(v)
-            return tuple([v for v in outputs.values()])
+            return tuple([outputs[k] for k in self.keys])
 
         elif self.mode == CollateMode.MOSAIC:
             row, col = self._row_col
@@ -114,6 +114,8 @@ class CollateFunctionBase(Callable):
                     outputs[k] = torch.stack(batch[k], 0)
                 else:
                     raise NotImplementedError(f"Keyword: {k} is not implemented.")
+
+            return tuple([outputs[k] for k in self.keys])
         else:
             raise NotImplementedError(f"Collate mode: {self.mode} is not implemented.")
 
