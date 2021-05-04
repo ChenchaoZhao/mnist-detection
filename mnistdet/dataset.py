@@ -10,7 +10,7 @@ from .simulator import generate_detection_image_with_annotation
 __all__ = ["DetectionDatasetBase", "DetectionWithCenterMask"]
 
 
-class DetectionDatasetBase:
+class DetectionDatasetBase(torch.utils.data.Dataset):
     """
     Params:
         data_src: torch image Dataset
@@ -26,7 +26,7 @@ class DetectionDatasetBase:
 
     def __init__(
         self,
-        data_src: Sequence[Image.Image, int],
+        data_src: Sequence[Tuple[Image.Image, int]],
         avg_num: Union[float, int],
         max_iter: int = 1000,
         poisson: bool = True,
