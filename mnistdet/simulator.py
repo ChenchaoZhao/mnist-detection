@@ -4,18 +4,13 @@ import PIL
 from typing import *
 from PIL import Image, ImageDraw
 from omegaconf import OmegaConf
+from .config import DEFAULT_CONFIG
 
 __all__ = ["DEFAULT_CONFIG", "load_configs", "generate_detection_image_with_annotation"]
 
 
 def load_configs(path):
-
     return OmegaConf.load(path)
-
-
-CONFIG_PATH = os.path.join("configs", "simulator.yaml")
-
-DEFAULT_CONFIG = load_configs(CONFIG_PATH).DEFAULT
 
 
 def generate_detection_image_with_annotation(
