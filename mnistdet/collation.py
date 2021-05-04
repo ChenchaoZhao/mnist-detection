@@ -12,15 +12,31 @@ class CollateMode(Enum):
 
 
 def collate_pil_images(
-    images: List[Image.Image],
+    images: Union[Sequence[Image.Image], Sequence[torch.Tensor]],
     rows: int,
     columns: int,
     atom_size: Optional[Tuple[int, int]] = None,
     mode: str = "RGB",
-):
+    to_tensor: bool = False,
+) -> Union[Image.Image, torch.Tensor]:
 
     if atom_size is None:
         atom_size = images[0].size
+    else:
+        atom_size = tuple(atom_size)
+
+    pil_images = []
+    for img in images:
+        if isinstance(img, torch.Tensor):
+            pil_img = TF.to_pil_img(img)
+        elif isinstance(img, Image.Image):
+            pil_img = img
+        else:
+            raise TypeError(
+                f"Type of image {type(img)} is not in (`PIL.Image.Image`, `torch.Tensor`)"
+            )
+        assert pil_img.size == atom_size
+        pil_images.append(pil_img)
 
     w, h = atom_size
 
@@ -36,18 +52,20 @@ def collate_pil_images(
             img.paste(images[idx], (w * cdx, h * rdx))
             idx += 1
 
-    return img
+    return TF.to_tensor(img) if to_tensor else img
 
 
 def collate_boxes(
-    boxes: List[torch.Tensor], rows: int, columns: int, atom_size: Tuple[int, int]
-):
+    boxes: List[torch.Tensor],  # boxes in relative coordinates, float tensors
+    rows: int,
+    columns: int,
+) -> torch.Tensor:
 
     idx = 0
     for rdx in range(rows):
         for cdx in range(columns):
-            boxes[idx][:, 0::2] += cdx * atom_size[0]
-            boxes[idx][:, 1::2] += rdx * atom_size[1]
+            boxes[idx][:, 0::2] += cdx
+            boxes[idx][:, 1::2] += rdx
             idx += 1
 
     return torch.cat(boxes)
@@ -85,17 +103,17 @@ class CollateFunctionBase(Callable):
             return tuple([v for v in outputs.values()])
 
         elif self.mode == CollateMode.MOSAIC:
+            row, col = self._row_col
             outputs = {}
             for k in self.keys:
                 if k == "image" or k == "mask":
-                    outputs[k] = collate_pil_images(batch[k])
+                    outputs[k] = collate_pil_images(batch[k], rows=row, columns=col)
                 elif k == "bbox":
-                    outputs[k] = collate_boxes(batch[k])
+                    outputs[k] = collate_boxes(batch[k], rows=row, columns=col)
                 elif k == "label":
                     outputs[k] = torch.stack(batch[k], 0)
                 else:
                     raise NotImplementedError(f"Keyword: {k} is not implemented.")
-
         else:
             raise NotImplementedError(f"Collate mode: {self.mode} is not implemented.")
 
