@@ -24,6 +24,8 @@ class DetectionDatasetBase(torch.utils.data.Dataset):
         label: Tensor, shape (N,)
     """
 
+    REPR_INDENT = 2
+
     def __init__(
         self,
         data_src: Sequence[Tuple[Image.Image, int]],
@@ -59,7 +61,7 @@ class DetectionDatasetBase(torch.utils.data.Dataset):
     def __repr__(self) -> str:
         out = []
         out.append(self.__class__.__name__)
-        for k, v in self.__class__.__dict__.items():
+        for k, v in self.__dict__.items():
             out.append(self.REPR_INDENT * " " + f"{k}: {v}")
 
         return "\n".join(out)

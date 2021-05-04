@@ -141,7 +141,7 @@ class CollateFunctionBase(Callable):
     def __repr__(self) -> str:
         out = []
         out.append(self.__class__.__name__)
-        for k, v in self.__class__.__dict__.items():
+        for k, v in self.__dict__.items():
             out.append(self.REPR_INDENT * " " + f"{k}: {v}")
 
         return "\n".join(out)
