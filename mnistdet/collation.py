@@ -72,6 +72,22 @@ def collate_boxes(
 
 
 class CollateFunctionBase(Callable):
+    """CollateFunctionBase:
+    factory class of collate functions
+
+    params:
+        keys: sequence of keywords
+        mode: collation mode
+        mosaic_row_col: number of rows and number of columns of mosaic collation
+
+    example usage:
+
+        collate_fn = CollateFunctionBase(keys=['image', 'bbox', 'label'], mode='tolist')
+
+        or
+
+        collate_fn = CollateFunctionBase(keys=['image', 'mask', 'bbox', 'label'], mode='mosaic', mosaic_row_col=(3, 3))
+    """
 
     REPR_INDENT = 2
     KEYS = {"image", "mask", "bbox", "label"}
