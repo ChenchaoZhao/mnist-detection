@@ -30,7 +30,8 @@ def collate_pil_images(
         atom_size = tuple(atom_size)
 
     pil_images = []
-    for img in images:
+    temp = []
+    for idx, img in enumerate(images):
         if isinstance(img, torch.Tensor):
             pil_img = TF.to_pil_img(img)
         elif isinstance(img, Image.Image):
@@ -40,21 +41,18 @@ def collate_pil_images(
                 f"Type of image {type(img)} is not in (`PIL.Image.Image`, `torch.Tensor`)"
             )
         assert pil_img.size == atom_size
-        pil_images.append(pil_img.convert(mode))
+        pil_img = pil_img.convert(mode)
+        temp.append(np.array(pil_img))
+        if idx % columns == 0 and idx > 0:
+            pil_images.append(np.concatenate(temp, 1))
+            temp = []
+    pil_images = np.concatenate(pil_images, 0)
+
+    img = Image.fromarray(pil_images, mode=mode)
 
     w, h = atom_size
-
-    assert rows * columns == len(images)
-
     W, H = w * columns, h * rows
-
-    img = Image.new(mode, (W, H))
-    idx = 0
-    for rdx in range(rows):
-        for cdx in range(columns):
-
-            img.paste(images[idx], (w * cdx, h * rdx))
-            idx += 1
+    assert img.size == (W, H)
 
     return TF.to_tensor(img) if to_tensor else img
 
