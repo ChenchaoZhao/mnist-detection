@@ -115,6 +115,7 @@ class CollateFunctionBase(Callable):
             assert mosaic_row_col is not None
         self._row_col = mosaic_row_col
         self._to_tensor = to_tensor
+        self.batch_size = mosaic_row_col[0] * mosaic_row_col[1]
 
     def __call__(self, batch: Dict[str, Tuple[Any]]) -> Tuple[Any]:
 
