@@ -43,7 +43,7 @@ def collate_pil_images(
         assert pil_img.size == atom_size
         pil_img = pil_img.convert(mode)
         temp.append(np.array(pil_img))
-        if idx % columns == 0 and idx > 0:
+        if (idx + 1) % columns == 0:
             pil_images.append(np.concatenate(temp, 1))
             temp = []
     pil_images = np.concatenate(pil_images, 0)
@@ -52,7 +52,7 @@ def collate_pil_images(
 
     w, h = atom_size
     W, H = w * columns, h * rows
-    assert img.size == (W, H)
+    assert img.size == (W, H), f"Image size {img.size} != {(W, H)}"
 
     return TF.to_tensor(img) if to_tensor else img
 
